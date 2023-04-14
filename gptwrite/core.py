@@ -113,19 +113,26 @@ def generate_texts(
 
         messages.append({"role": "system", "content": i18n.t("messages.", locale=lang_for_description)})
 
-    result_texts = ""
-    while True:
-        result_texts += rewrite_texts(writes, lang_for_generating)
-        if not questionary.confirm(i18n.t("messages.want_more", locale=lang_for_description)).unsafe_ask():
-            break
-    return "\n".join(result_texts)
+    return rewrite_texts(writes, lang_for_generating, lang_for_description, generate_text_func)
 
 def rewrite_texts(
         sentences: List[str],
         lang_for_generating: str,
+        lang_for_description: str,
         generate_text_func: GenerateFunc = generate_text_by_llm,
     ) -> str:
+    print(i18n.t("messages.rewrite", locale=lang_for_description))
     messages = [{
         "role": "user",
         "content": build_prompt_rewrite_texts(sentences, lang_for_generating)
     }]
+
+    result_texts = ""
+    while True:
+        content = generate_text_func(messages)
+        print(content)
+        result_texts += content
+        if not questionary.confirm(i18n.t("messages.want_more", locale=lang_for_description)).unsafe_ask():
+            break
+        messages.append({"role": "user", "content": f"[Request]{i18n.t('messages.want_more', locale=lang_for_description)}"})
+    return result_texts

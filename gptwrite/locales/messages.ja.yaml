@@ -12,5 +12,6 @@ ja:
   remove_topics: 選択したトピックについてはもう書きませんか？
   confirm_want_more: もっと書いて欲しいですか？
   want_more: 続きを書いてください。
+  rewrite: 生成された文章を読みやすいように書き直します。
   save: 生成された文章をファイルに保存しますか？
   no_api_key: OPENAI_API_KEYを環境変数にセットしてください。

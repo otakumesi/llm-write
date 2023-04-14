@@ -12,5 +12,6 @@ en:
   remove_topics: Do you want to write anymore about your selected topic?
   confirm_want_more: Want me to write more? 
   want_more: Please continue.
+  rewrite: Rewrite the generated text to make it more readable.
   save: Want to save generated paragraphs into file?
   no_api_key: Please set OPENAI_API_KEY environment variable.

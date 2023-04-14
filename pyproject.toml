@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gptwrite"
-version = "0.1.1"
+version = "0.1.2"
 description = "CLI for Automated article writing"
 authors = ["otakumesi <bakednt@gmail.com>"]
 license = "MIT"
