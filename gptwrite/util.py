@@ -1,11 +1,12 @@
 import logging
 import i18n
+from iso639 import Lang
 
 
 logger = logging.getLogger(__name__)
 
 
-def init_i18n(lang):
+def init_i18n(lang: Lang) -> str:
     i18n.set("locale", lang.pt1)
     i18n.set("fallback", "en")
     i18n.set("file_format", "yaml")

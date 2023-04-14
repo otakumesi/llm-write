@@ -1,6 +1,13 @@
+from typing import List, Optional
+
+
 # Topic Prompts
 
-def build_prompt_generate_topics(theme, language, nuance=None):
+def build_prompt_generate_topics(
+        theme: str,
+        language: str,
+        nuance: Optional[str] = None
+    ):
     prompt = GENERATE_TOPICS_PROMPT_PREFIX.format(theme=theme, language=language)
     if nuance:
         prompt += GENERATE_TOPICS_PROMPT_NUANCE.format(nuance=nuance)
@@ -37,7 +44,12 @@ GENERATE_TOPICS_PROMPT_SUFFIX = """
 
 # Text Generating Prompts
 
-def build_prompt_generate_texts(theme, topics, nuance, language):
+def build_prompt_generate_texts(
+        theme: str,
+        nuance: str,
+        language: str,
+        topics: List[str],
+    ):
     return GENERATE_TEXT_PROMPT.format(
         theme=theme,
         topics="\n".join(["- " + topic for topic in topics]),
@@ -75,7 +87,7 @@ Write: you write paragraph based on topics in an article about {theme}.
 
 # Text Rewriting Prompts
 
-def build_prompt_rewrite_texts(sentences, language):
+def build_prompt_rewrite_texts(sentences: List[str], language: str):
     return REWRITING_TEXT_PROMPT.format(
         sentences="\n".join(["- " + sentence for sentence in sentences]),
         language=language)

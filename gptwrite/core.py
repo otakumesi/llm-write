@@ -1,34 +1,55 @@
 import re
 import logging
+from typing import List, Callable, Optional, Dict
 import i18n
 import openai
 import questionary
 from gptwrite.prompts import build_prompt_generate_topics, build_prompt_generate_texts, build_prompt_rewrite_texts
 
 
+GenerateFunc = Callable[[str, List[str], Optional[str], str, str], str]
+OpenAIMessages = List[Dict[str, str]]
+
 ACTIONS = ["Thought", "Consult", "Write"]
 
 logger = logging.getLogger(__name__)
 
 
-def select_topics(topics, lang_for_description):
+def generate_text_by_llm(
+        messages: OpenAIMessages,
+        model_name: str = "gpt-3.5-turbo",
+        stop: Optional[str] = None
+    ) -> str:
+    response = openai.ChatCompletion.create(
+        model=model_name,
+        messages=messages,
+        stop=stop)
+    content = response.choices[0].message.content
+    return content
+
+def select_topics(
+        topics: List[str],
+        lang_for_description: str,
+    ) -> List[str]:
     selected_topics = questionary.checkbox(
         i18n.t("messages.want_topic", locale=lang_for_description),
         choices=topics).unsafe_ask()
     return selected_topics
 
-def generate_topics(theme, lang_for_generating, nuance=None):
+def generate_topics(
+        theme: str,
+        lang_for_generating: str,
+        nuance: Optional[str] = None,
+        generate_text_func: GenerateFunc = generate_text_by_llm,
+    ) -> List[str]:
     messages = [{
         "role": "user",
         "content": build_prompt_generate_topics(theme, lang_for_generating, nuance)
     }]
-    response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=messages)
-    content = response.choices[0].message.content
+    content = generate_text_func(messages=messages)
     return put_generated_text_into_list(content)
 
-def put_generated_text_into_list(text):
+def put_generated_text_into_list(text: str) -> List[str]:
     topics = []
     for line in text.split("\n"):
         if line.startswith("- "):
@@ -46,7 +67,14 @@ def put_generated_text_into_list(text):
             continue
     return topics
 
-def generate_texts(theme, topics, nuance, lang_for_generating, lang_for_description):
+def generate_texts(
+        theme: str,
+        topics: List[str],
+        nuance: Optional[str],
+        lang_for_generating: str,
+        lang_for_description: str,
+        generate_text_func: GenerateFunc  = generate_text_by_llm,
+    ) -> str:
     messages = [{
         "role": "user",
         "content": build_prompt_generate_texts(theme, topics, nuance, lang_for_generating)
@@ -55,11 +83,7 @@ def generate_texts(theme, topics, nuance, lang_for_generating, lang_for_descript
     writes = []
 
     while True:
-        response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=messages,
-                stop="\n\n")
-        content = response.choices[0].message.content
+        content = generate_text_func(messages=messages, stop="\n\n")
         print(content)
 
         if content.startswith("[Consult]"):
@@ -93,16 +117,15 @@ def generate_texts(theme, topics, nuance, lang_for_generating, lang_for_descript
     while True:
         result_texts += rewrite_texts(writes, lang_for_generating)
         if not questionary.confirm(i18n.t("messages.want_more", locale=lang_for_description)).unsafe_ask():
-            break 
+            break
     return "\n".join(result_texts)
 
-def rewrite_texts(sentences, lang_for_generating):
+def rewrite_texts(
+        sentences: List[str],
+        lang_for_generating: str,
+        generate_text_func: GenerateFunc = generate_text_by_llm,
+    ) -> str:
     messages = [{
         "role": "user",
         "content": build_prompt_rewrite_texts(sentences, lang_for_generating)
     }]
-    response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=messages)
-    content = response.choices[0].message.content
-    return content
