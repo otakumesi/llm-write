@@ -7,8 +7,8 @@ import questionary
 from gptwrite.prompts import build_prompt_generate_topics, build_prompt_generate_texts, build_prompt_rewrite_texts
 
 
-GenerateFunc = Callable[[str, List[str], Optional[str], str, str], str]
 OpenAIMessages = List[Dict[str, str]]
+GenerateFunc = Callable[[OpenAIMessages, str, Optional[str]], str]
 
 ACTIONS = ["Thought", "Consult", "Write"]
 
@@ -42,9 +42,10 @@ def generate_topics(
         nuance: Optional[str] = None,
         generate_text_func: GenerateFunc = generate_text_by_llm,
     ) -> List[str]:
+    prompt = build_prompt_generate_topics(theme=theme, language=lang_for_generating, nuance=nuance)
     messages = [{
         "role": "user",
-        "content": build_prompt_generate_topics(theme, lang_for_generating, nuance)
+        "content": prompt,
     }]
     content = generate_text_func(messages=messages)
     return put_generated_text_into_list(content)
@@ -70,14 +71,15 @@ def put_generated_text_into_list(text: str) -> List[str]:
 def generate_texts(
         theme: str,
         topics: List[str],
-        nuance: Optional[str],
+        nuance: str,
         lang_for_generating: str,
         lang_for_description: str,
         generate_text_func: GenerateFunc  = generate_text_by_llm,
     ) -> str:
+    prompt = build_prompt_generate_texts(theme=theme, topics=topics, nuance=nuance, language=lang_for_generating)
     messages = [{
         "role": "user",
-        "content": build_prompt_generate_texts(theme, topics, nuance, lang_for_generating)
+        "content": prompt,
     }]
 
     writes = []
@@ -90,14 +92,14 @@ def generate_texts(
             comprementary = questionary.text(i18n.t("messages.want_complementary", locale=lang_for_description)).unsafe_ask()
             messages.append({
                 "role": "user",
-                "content": f"[Complement]{comprementary}"
+                "content": f"[Complement]{comprementary}",
             })
             continue
 
         if content.startswith("[Thought]"):
             messages.append({
                 "role": "assistant",
-                "content": content
+                "content": content,
             })
             continue
         
@@ -107,7 +109,7 @@ def generate_texts(
                 break
             messages.append({
                 "role": "assistant",
-                "content": f"[Request]{i18n.t('messages.want_more', locale=lang_for_description)}"
+                "content": f"[Request]{i18n.t('messages.want_more', locale=lang_for_description)}",
             }) 
             continue
 
@@ -122,9 +124,10 @@ def rewrite_texts(
         generate_text_func: GenerateFunc = generate_text_by_llm,
     ) -> str:
     print(i18n.t("messages.rewrite", locale=lang_for_description))
+    prompt = build_prompt_rewrite_texts(sentences=sentences, language=lang_for_generating)
     messages = [{
         "role": "user",
-        "content": build_prompt_rewrite_texts(sentences, lang_for_generating)
+        "content": prompt,
     }]
 
     result_texts = ""
