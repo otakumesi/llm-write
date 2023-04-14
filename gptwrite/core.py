@@ -89,7 +89,12 @@ def generate_texts(theme, topics, nuance, lang_for_generating, lang_for_descript
 
         messages.append({"role": "system", "content": i18n.t("messages.", locale=lang_for_description)})
 
-    return rewrite_texts(writes, lang_for_generating)
+    result_texts = ""
+    while True:
+        result_texts += rewrite_texts(writes, lang_for_generating)
+        if not questionary.confirm(i18n.t("messages.want_more", locale=lang_for_description)).unsafe_ask():
+            break 
+    return "\n".join(result_texts)
 
 def rewrite_texts(sentences, lang_for_generating):
     messages = [{
