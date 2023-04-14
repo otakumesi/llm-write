@@ -1,0 +1,16 @@
+ja:
+  want_theme: 書きたいテーマをざっくりと教えてください。
+  want_topic: 書きたいトピックを選択してください。
+  want_add_topic: トピックを追加しますか？
+  want_add_paragraph: パラグラフを追加しますか？
+  want_topic_nuance: どのようなトピックが欲しいですか？
+  want_paragraph_nuance: どんな感じの内容が良いですか？
+  want_paragraph_topic: 今回はどのトピックから内容を書きますか？
+  want_complementary: GPTが欲しがってる追加の情報をあげてください。
+  include_action: 必ず言葉の先頭にThought, Consult, Writeのいずれかを [<Action>] というprefixとしてつけてください。
+  accept_text: こんなパラグラフが生成されました。いかがでしょうか？
+  remove_topics: 選択したトピックについてはもう書きませんか？
+  confirm_want_more: もっと書いて欲しいですか？
+  want_more: 続きを書いてください。
+  save: 生成された文章をファイルに保存しますか？
+  no_api_key: OPENAI_API_KEYを環境変数にセットしてください。

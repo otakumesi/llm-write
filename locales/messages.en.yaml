@@ -1,0 +1,16 @@
+en:
+  want_theme: Please give us a rough idea of the topic you would like to write about.
+  want_topic: Select the topic you want to write about.
+  want_add_topic: Want to add topics?
+  want_add_paragraph: Want to add paragraphs?
+  want_topic_nuance: What topics would you like to see?
+  want_paragraph_nuance: What kind of content would you like?o
+  want_paragraph_topic: Which topic will you write the content from this time?
+  want_complementary: Please give additional information that GPT wants.
+  include_action: Be sure to prefix the word Thought, Consult, or Write with the prefix [<Action>].
+  accept_text: This paragraph was generated. How do you like it?
+  remove_topics: Do you want to write anymore about your selected topic?
+  confirm_want_more: Want me to write more? 
+  want_more: Please continue.
+  save: Want to save generated paragraphs into file?
+  no_api_key: Please set OPENAI_API_KEY environment variable.
