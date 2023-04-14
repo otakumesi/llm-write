@@ -66,14 +66,14 @@ def generate_texts(theme, topics, nuance, lang_for_generating, lang_for_descript
             comprementary = questionary.text(i18n.t("messages.want_complementary", locale=lang_for_description)).unsafe_ask()
             messages.append({
                 "role": "user",
-                "content": comprementary
+                "content": f"[Complement]{comprementary}"
             })
             continue
 
         if content.startswith("[Thought]"):
             messages.append({
                 "role": "assistant",
-                "content": f"[Complement]{content}"
+                "content": content
             })
             continue
         
