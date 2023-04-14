@@ -2,7 +2,6 @@
 
 GPT make writing an article brazing fast🔥.  
 ![GPT-Write Demo](https://github.com/otakumesi/gpt-write/blob/main/demo.gif?raw=true "デモ")
----
 
 ## What's this tool?
 
