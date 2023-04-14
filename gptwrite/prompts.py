@@ -1,10 +1,11 @@
+# Topic Prompts
+
 def build_prompt_generate_topics(theme, language, nuance=None):
     prompt = GENERATE_TOPICS_PROMPT_PREFIX.format(theme=theme, language=language)
     if nuance:
         prompt += GENERATE_TOPICS_PROMPT_NUANCE.format(nuance=nuance)
     prompt += GENERATE_TOPICS_PROMPT_SUFFIX.format(language=language)
     return prompt
-
 
 GENERATE_TOPICS_PROMPT_PREFIX = """# Instruction
 A user wants to write an article based on the following theme.
@@ -32,6 +33,9 @@ GENERATE_TOPICS_PROMPT_SUFFIX = """
 # System Output (Topics)
 <Your outputs>"""
 
+
+
+# Text Generating Prompts
 
 def build_prompt_generate_texts(theme, topics, nuance, language):
     return GENERATE_TEXT_PROMPT.format(
@@ -66,4 +70,21 @@ Write: you write paragraph based on topics in an article about {theme}.
 # CAUTION
 - Please include the action in your answer.
 - Please write the action in square brackets.
+- Please must be sure to reply using {language}!"""
+
+
+# Text Rewriting Prompts
+
+def build_prompt_rewrite_texts(sentences, language):
+    return REWRITING_TEXT_PROMPT.format(
+        sentences="\n".join(["- " + sentence for sentence in sentences]),
+        language=language)
+
+REWRITING_TEXT_PROMPT = """# Instruction
+Please Write good paragraphs, piecing together the following sentences given.
+
+# Sentences
+{sentences}
+
+# CAUTION
 - Please must be sure to reply using {language}!"""

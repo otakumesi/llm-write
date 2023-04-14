@@ -3,7 +3,7 @@ import logging
 import i18n
 import openai
 import questionary
-from prompts import build_prompt_generate_topics, build_prompt_generate_texts
+from gptwrite.prompts import build_prompt_generate_topics, build_prompt_generate_texts, build_prompt_rewrite_texts
 
 
 ACTIONS = ["Thought", "Consult", "Write"]
@@ -89,7 +89,15 @@ def generate_texts(theme, topics, nuance, lang_for_generating, lang_for_descript
 
         messages.append({"role": "system", "content": i18n.t("messages.", locale=lang_for_description)})
 
-    return rewrite_texts(writes)
+    return rewrite_texts(writes, lang_for_generating)
 
-def rewrite_texts():
-    pass
+def rewrite_texts(sentences, lang_for_generating):
+    messages = [{
+        "role": "user",
+        "content": build_prompt_rewrite_texts(sentences, lang_for_generating)
+    }]
+    response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=messages)
+    content = response.choices[0].message.content
+    return content

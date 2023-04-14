@@ -4,9 +4,9 @@ from pathlib import Path
 from iso639 import Lang
 import i18n
 import questionary
-from util import init_i18n
-from accepted_language import ACCEPTED_LANGUAGES
-from core import select_topics, generate_topics, generate_texts
+from gptwrite.util import init_i18n
+from gptwrite.accepted_language import ACCEPTED_LANGUAGES
+from gptwrite.core import select_topics, generate_topics, generate_texts
 
 
 logger = logging.getLogger(__name__)
