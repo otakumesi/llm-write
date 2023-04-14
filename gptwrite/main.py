@@ -10,7 +10,7 @@ from core import select_topics, generate_topics, generate_texts
 
 
 logger = logging.getLogger(__name__)
-i18n.load_path.append(Path(__file__).parent.parent.absolute() / "locales")
+i18n.load_path.append(Path(__file__).parent.absolute() / "locales")
 
 
 def write():
