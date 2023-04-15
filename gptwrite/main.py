@@ -1,59 +1,53 @@
 import os
 import logging
 from pathlib import Path
-from iso639 import Lang
-import i18n
 import questionary
-from gptwrite.util import init_i18n
+from gptwrite.lang_conf import LangConf
 from gptwrite.accepted_language import ACCEPTED_LANGUAGES
 from gptwrite.core import select_topics, generate_topics, generate_texts
 
 
 logger = logging.getLogger(__name__)
-i18n.load_path.append(Path(__file__).parent.absolute() / "locales")
 
 
 def write() -> None:
     lang = questionary.select('Language?', default="English", choices=ACCEPTED_LANGUAGES).unsafe_ask()
-    lang = Lang(lang)
-
-    lang_for_generating = lang.name
-    lang_for_description = init_i18n(lang)
+    lang_conf = LangConf.from_lang(lang)
 
     if not os.environ.get("OPENAI_API_KEY", None):
-        logger.error(i18n.t("messages.no_api_key", locale=lang_for_description))
+        logger.error(lang_conf.t("messages.no_api_key"))
         exit()
 
-    theme = questionary.text(i18n.t("messages.want_theme", locale=lang_for_description)).unsafe_ask()
-    generated_topics = generate_topics(theme, lang_for_generating)
-    selected_topics = select_topics(generated_topics, lang_for_description)
+    theme = questionary.text(lang_conf.t("messages.want_theme")).unsafe_ask()
+    generated_topics = generate_topics(theme, lang_conf)
+    selected_topics = select_topics(generated_topics, lang_conf)
 
     while True:
-        if questionary.confirm(i18n.t("messages.want_add_topic", locale=lang_for_description), default=False).unsafe_ask():
-            topic_nuance = questionary.text(i18n.t("messages.want_topic_nuance", locale=lang_for_description)).unsafe_ask()
-            generated_topics = generate_topics(theme, lang_for_generating, topic_nuance)
-            selected_topics += select_topics(generated_topics, lang_for_description)
+        if questionary.confirm(lang_conf.t("messages.want_add_topic"), default=False).unsafe_ask():
+            topic_nuance = questionary.text(lang_conf.t("messages.want_topic_nuance")).unsafe_ask()
+            generated_topics = generate_topics(theme=theme, lang_conf=lang_conf, nuance=topic_nuance)
+            selected_topics += select_topics(topics=generated_topics, lang_conf=lang_conf)
         else:
             break
 
     paragraphs = []
     while selected_topics:
         paragraph_topics = questionary.checkbox(
-            i18n.t("messages.want_paragraph_topic", locale=lang_for_description),
+            lang_conf.t("messages.want_paragraph_topic"),
             choices=selected_topics).unsafe_ask()
-        paragraph_nuance = questionary.text(i18n.t("messages.want_paragraph_nuance", locale=lang_for_description)).unsafe_ask()
-        text = generate_texts(theme, paragraph_topics, paragraph_nuance, lang_for_generating, lang_for_description)
+        paragraph_nuance = questionary.text(lang_conf.t("messages.want_paragraph_nuance")).unsafe_ask()
+        text = generate_texts(theme=theme, topics=paragraph_topics, nuance=paragraph_nuance, lang_conf=lang_conf)
 
-        if questionary.confirm(i18n.t("messages.accept_text") + "\n" + text).unsafe_ask():
+        if questionary.confirm(lang_conf.t("messages.accept_text") + "\n" + text).unsafe_ask():
             paragraphs.append(text)
-            if questionary.confirm(i18n.t("messages.remove_topics")).unsafe_ask():
+            if questionary.confirm(lang_conf.t("messages.remove_topics")).unsafe_ask():
                 selected_topics = [t for t in selected_topics if t not in paragraph_topics]
         
-        if not questionary.confirm(i18n.t("messages.want_add_paragraph", locale=lang_for_description), default=True).unsafe_ask():
+        if not questionary.confirm(lang_conf.t("messages.want_add_paragraph"), default=True).unsafe_ask():
             break
 
     article = "\n\n".join(paragraphs)
-    if questionary.confirm(i18n.t("messages.save", locale=lang_for_description), default=False).ask():
+    if questionary.confirm(lang_conf.t("messages.save"), default=False).ask():
         try:
             output_path = questionary.text('Output Path?').ask()
             Path(output_path).write_text(article)

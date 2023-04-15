@@ -1,16 +1,16 @@
 import re
 import logging
-from typing import Optional, Any, Protocol, Self
-import i18n
+from typing import Optional, Any, Protocol, List, Dict
 import openai
 import questionary
 from gptwrite.prompts import build_prompt_generate_topics, build_prompt_generate_texts, build_prompt_rewrite_texts
+from gptwrite.lang_conf import LangConf
 
 
-OpenAIMessages = list[dict[str, str]]
+OpenAIMessages = List[Dict[str, str]]
 class ExecuteLLM(Protocol):
     def __call__(
-            self: Self,
+            self,
             messages: OpenAIMessages,
             model_name: str = "gpt-3.5-turbo",
             stop: Optional[str] = None,
@@ -36,21 +36,21 @@ def generate_text_by_llm(
     return content
 
 def select_topics(
-        topics: list[str],
-        lang_for_description: str,
-    ) -> list[str]:
+        topics: List[str],
+        lang_conf: LangConf,
+    ) -> List[str]:
     selected_topics = questionary.checkbox(
-        i18n.t("messages.want_topic", locale=lang_for_description),
+        lang_conf.t("messages.want_topic"),
         choices=topics).unsafe_ask()
     return selected_topics
 
 def generate_topics(
         theme: str,
-        lang_for_generating: str,
+        lang_conf: LangConf,
         nuance: Optional[str] = None,
         generate_text_func: ExecuteLLM = generate_text_by_llm,
-    ) -> list[str]:
-    prompt = build_prompt_generate_topics(theme=theme, language=lang_for_generating, nuance=nuance)
+    ) -> List[str]:
+    prompt = build_prompt_generate_topics(theme=theme, language=lang_conf.generation, nuance=nuance)
     messages = [{
         "role": "user",
         "content": prompt,
@@ -58,7 +58,7 @@ def generate_topics(
     content = generate_text_func(messages=messages)
     return put_generated_text_into_list(content)
 
-def put_generated_text_into_list(text: str) -> list[str]:
+def put_generated_text_into_list(text: str) -> List[str]:
     topics = []
     for line in text.split("\n"):
         if line.startswith("- "):
@@ -78,13 +78,12 @@ def put_generated_text_into_list(text: str) -> list[str]:
 
 def generate_texts(
         theme: str,
-        topics: list[str],
+        topics: List[str],
         nuance: str,
-        lang_for_generating: str,
-        lang_for_description: str,
+        lang_conf: LangConf,
         generate_text_func: ExecuteLLM = generate_text_by_llm,
     ) -> str:
-    prompt = build_prompt_generate_texts(theme=theme, topics=topics, nuance=nuance, language=lang_for_generating)
+    prompt = build_prompt_generate_texts(theme=theme, topics=topics, nuance=nuance, language=lang_conf.generation)
     messages = [{
         "role": "user",
         "content": prompt,
@@ -97,7 +96,7 @@ def generate_texts(
         print(content)
 
         if content.startswith("[Consult]"):
-            comprementary = questionary.text(i18n.t("messages.want_complementary", locale=lang_for_description)).unsafe_ask()
+            comprementary = questionary.text(lang_conf.t("messages.want_complementary")).unsafe_ask()
             messages.append({
                 "role": "user",
                 "content": f"[Complement]{comprementary}",
@@ -113,26 +112,25 @@ def generate_texts(
         
         if content.startswith("[Write]"):
             writes.append(content[7:].strip())
-            if not questionary.confirm(i18n.t("messages.confirm_want_more", locale=lang_for_description)).unsafe_ask():
+            if not questionary.confirm(lang_conf.t("messages.confirm_want_more")).unsafe_ask():
                 break
             messages.append({
                 "role": "assistant",
-                "content": f"[Request]{i18n.t('messages.want_more', locale=lang_for_description)}",
+                "content": f"[Request]{lang_conf.t('messages.want_more')}",
             }) 
             continue
 
-        messages.append({"role": "system", "content": i18n.t("messages.", locale=lang_for_description)})
+        messages.append({"role": "system", "content": lang_conf.t("messages.include_action")})
 
-    return rewrite_texts(writes, lang_for_generating, lang_for_description)
+    return rewrite_texts(writes, lang_conf)
 
 def rewrite_texts(
-        sentences: list[str],
-        lang_for_generating: str,
-        lang_for_description: str,
+        sentences: List[str],
+        lang_conf: LangConf,
         generate_text_func: ExecuteLLM = generate_text_by_llm,
     ) -> str:
-    print(i18n.t("messages.rewrite", locale=lang_for_description))
-    prompt = build_prompt_rewrite_texts(sentences=sentences, language=lang_for_generating)
+    print(lang_conf.t("messages.rewrite"))
+    prompt = build_prompt_rewrite_texts(sentences=sentences, language=lang_conf.generation)
     messages = [{
         "role": "user",
         "content": prompt,
@@ -143,7 +141,7 @@ def rewrite_texts(
         content = generate_text_func(messages=messages)
         print(content)
         result_texts += content
-        if not questionary.confirm(i18n.t("messages.want_more", locale=lang_for_description)).unsafe_ask():
+        if not questionary.confirm(lang_conf.t("messages.want_more")).unsafe_ask():
             break
-        messages.append({"role": "user", "content": f"[Request]{i18n.t('messages.want_more', locale=lang_for_description)}"})
+        messages.append({"role": "user", "content": f"[Request]{lang_conf.t('messages.want_more')}"})
     return result_texts
