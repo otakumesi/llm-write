@@ -2,9 +2,10 @@ import re
 import logging
 from typing import Optional, Any, Protocol, List, Dict
 import openai
-import questionary
+from yaspin import yaspin
 from gptwrite.prompts import build_prompt_generate_topics, build_prompt_generate_texts, build_prompt_rewrite_texts
 from gptwrite.lang_conf import LangConf
+from gptwrite.questionary_ui import QuestionaryUI
 
 
 OpenAIMessages = List[Dict[str, str]]
@@ -25,24 +26,18 @@ logger = logging.getLogger(__name__)
 
 def generate_text_by_llm(
         messages: OpenAIMessages,
+        lang_conf: LangConf,
         model_name: str = "gpt-3.5-turbo",
         stop: Optional[str] = None
     ) -> str:
-    response: Any = openai.ChatCompletion.create(
-        model=model_name,
-        messages=messages,
-        stop=stop)
+    with yaspin(text=lang_conf.t("messages.generating_text"), color="yellow") as spinner:
+        response: Any = openai.ChatCompletion.create(
+            model=model_name,
+            messages=messages,
+            stop=stop)
+        spinner.ok("🆗")
     content = response.choices[0].message.content
     return content
-
-def select_topics(
-        topics: List[str],
-        lang_conf: LangConf,
-    ) -> List[str]:
-    selected_topics = questionary.checkbox(
-        lang_conf.t("messages.want_topic"),
-        choices=topics).unsafe_ask()
-    return selected_topics
 
 def generate_topics(
         theme: str,
@@ -55,7 +50,7 @@ def generate_topics(
         "role": "user",
         "content": prompt,
     }]
-    content = generate_text_func(messages=messages)
+    content = generate_text_func(messages=messages, lang_conf=lang_conf)
     return put_generated_text_into_list(content)
 
 def put_generated_text_into_list(text: str) -> List[str]:
@@ -80,10 +75,10 @@ def generate_texts(
         theme: str,
         topics: List[str],
         nuance: str,
-        lang_conf: LangConf,
+        qui: QuestionaryUI,
         generate_text_func: ExecuteLLM = generate_text_by_llm,
     ) -> str:
-    prompt = build_prompt_generate_texts(theme=theme, topics=topics, nuance=nuance, language=lang_conf.generation)
+    prompt = build_prompt_generate_texts(theme=theme, topics=topics, nuance=nuance, language=qui.lang_conf.generation)
     messages = [{
         "role": "user",
         "content": prompt,
@@ -92,14 +87,14 @@ def generate_texts(
     writes = []
 
     while True:
-        content = generate_text_func(messages=messages, stop="\n\n")
+        content = generate_text_func(messages=messages, stop="\n\n", lang_conf=qui.lang_conf)
         print(content)
 
         if content.startswith("[Consult]"):
-            comprementary = questionary.text(lang_conf.t("messages.want_complementary")).unsafe_ask()
+            comprementary = qui.ask_want_complementary()
             messages.append({
                 "role": "user",
-                "content": f"[Complement]{comprementary}",
+                "content": f"[Answer]{comprementary}",
             })
             continue
 
@@ -112,25 +107,25 @@ def generate_texts(
         
         if content.startswith("[Write]"):
             writes.append(content[7:].strip())
-            if not questionary.confirm(lang_conf.t("messages.confirm_want_more")).unsafe_ask():
+            if not qui.confirm_want_more():
                 break
             messages.append({
                 "role": "assistant",
-                "content": f"[Request]{lang_conf.t('messages.want_more')}",
+                "content": f"[Request]{qui.lang_conf.t('messages.want_more')}",
             }) 
             continue
 
-        messages.append({"role": "system", "content": lang_conf.t("messages.include_action")})
+        messages.append({"role": "system", "content": qui.lang_conf.t("messages.include_action")})
 
-    return rewrite_texts(writes, lang_conf)
+    return rewrite_texts(writes, qui)
 
 def rewrite_texts(
         sentences: List[str],
-        lang_conf: LangConf,
+        qui: QuestionaryUI,
         generate_text_func: ExecuteLLM = generate_text_by_llm,
     ) -> str:
-    print(lang_conf.t("messages.rewrite"))
-    prompt = build_prompt_rewrite_texts(sentences=sentences, language=lang_conf.generation)
+    print(qui.lang_conf.t("messages.rewrite"))
+    prompt = build_prompt_rewrite_texts(sentences=sentences, language=qui.lang_conf.generation)
     messages = [{
         "role": "user",
         "content": prompt,
@@ -138,10 +133,10 @@ def rewrite_texts(
 
     result_texts = ""
     while True:
-        content = generate_text_func(messages=messages)
+        content = generate_text_func(messages=messages, lang_conf=qui.lang_conf)
         print(content)
         result_texts += content
-        if not questionary.confirm(lang_conf.t("messages.want_more")).unsafe_ask():
+        if not qui.confirm_want_more():
             break
-        messages.append({"role": "user", "content": f"[Request]{lang_conf.t('messages.want_more')}"})
+        messages.append({"role": "user", "content": f"[Request]{qui.lang_conf.t('messages.want_more')}"})
     return result_texts

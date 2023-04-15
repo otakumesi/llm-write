@@ -20,11 +20,13 @@ What topics should be available to write an article on the entered theme?
 Please write a bullet list of the topics that might be needed.
 
 # User Input (Theme)
-{theme}"""
+{theme}
+"""
 
 GENERATE_TOPICS_PROMPT_NUANCE = """
 # Topic Scope
-{nuance}"""
+{nuance}
+"""
 
 GENERATE_TOPICS_PROMPT_SUFFIX = """
 # Output Example

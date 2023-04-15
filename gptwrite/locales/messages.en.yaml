@@ -8,6 +8,7 @@ en:
   want_paragraph_topic: Which topic will you write the content from this time?
   want_complementary: Please give additional information that GPT wants.
   include_action: Be sure to prefix the word Thought, Consult, or Write with the prefix [<Action>].
+  generating_text:  Generating texts.
   accept_text: This paragraph was generated. How do you like it?
   remove_topics: Do you want to write anymore about your selected topic?
   confirm_want_more: Want me to write more? 
