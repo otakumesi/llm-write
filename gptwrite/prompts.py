@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 
 # Topic Prompts
@@ -48,7 +48,7 @@ def build_prompt_generate_texts(
         theme: str,
         nuance: str,
         language: str,
-        topics: List[str],
+        topics: list[str],
     ):
     return GENERATE_TEXT_PROMPT.format(
         theme=theme,
@@ -87,7 +87,7 @@ Write: you write paragraph based on topics in an article about {theme}.
 
 # Text Rewriting Prompts
 
-def build_prompt_rewrite_texts(sentences: List[str], language: str):
+def build_prompt_rewrite_texts(sentences: list[str], language: str):
     return REWRITING_TEXT_PROMPT.format(
         sentences="\n".join(["- " + sentence for sentence in sentences]),
         language=language)

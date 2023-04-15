@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 i18n.load_path.append(Path(__file__).parent.absolute() / "locales")
 
 
-def write():
+def write() -> None:
     lang = questionary.select('Language?', default="English", choices=ACCEPTED_LANGUAGES).unsafe_ask()
     lang = Lang(lang)
 
