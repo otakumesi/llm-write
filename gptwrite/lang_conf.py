@@ -15,8 +15,8 @@ class LangConf:
 
     @staticmethod
     def from_lang(lang: str) -> "LangConf":
-        lang = Lang(lang)
-        return LangConf(lang.pt1, lang.name)
+        lang_obj = Lang(lang)
+        return LangConf(lang_obj.pt1, lang_obj.name)
 
     def __post_init__(self) -> None:
         self.init_i18n()
@@ -28,7 +28,7 @@ class LangConf:
                 "(There is no problem with generated text!) ")
             self.description = "en"
 
-    def init_i18n(self) -> str:
+    def init_i18n(self) -> None:
         i18n.load_path.append(Path(__file__).parent.absolute() / "locales")
         i18n.set("locale", self.description)
         i18n.set("fallback", "en")
