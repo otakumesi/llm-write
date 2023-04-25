@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "gptwrite"
+name = "llmwrite"
 version = "0.1.4"
-description = "CLI for Automated article writing"
+description = "CLI for Automated article writing (Powered by GPT-3)"
 authors = ["otakumesi <bakednt@gmail.com>"]
 license = "MIT"
-homepage = "https://github.com/otakumesi/gpt-write"
-repository = "https://github.com/otakumesi/gpt-write"
+homepage = "https://github.com/otakumesi/llm-write"
+repository = "https://github.com/otakumesi/llm-write"
 readme = "README.md"
 keywords = ["gpt", "openai", "cli", "article", "writing"]
 
@@ -25,10 +25,11 @@ pyright = "^1.1.303"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.3.0"
+pytest-mock = "^3.10.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-gptwrite = "gptwrite.main:write"
+llmwrite = "llmwrite.main:write"

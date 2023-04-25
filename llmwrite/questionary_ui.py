@@ -1,8 +1,8 @@
 from typing import List
 from dataclasses import dataclass
 import questionary
-from gptwrite.accepted_language import ACCEPTED_LANGUAGES
-from gptwrite.lang_conf import LangConf
+from llmwrite.accepted_language import ACCEPTED_LANGUAGES
+from llmwrite.lang_conf import LangConf
 
 
 class QuestionaryUI:

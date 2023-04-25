@@ -1,5 +1,5 @@
 import pytest
-from gptwrite.lang_conf import LangConf
+from llmwrite.lang_conf import LangConf
 
 
 def test_lang_conf():

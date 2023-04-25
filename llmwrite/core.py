@@ -3,9 +3,9 @@ import logging
 from typing import Optional, Any, Protocol, List, Dict
 import openai
 from yaspin import yaspin
-from gptwrite.prompts import build_prompt_generate_topics, build_prompt_generate_texts, build_prompt_rewrite_texts
-from gptwrite.lang_conf import LangConf
-from gptwrite.questionary_ui import QuestionaryUI
+from llmwrite.prompts import build_prompt_generate_topics, build_prompt_generate_texts, build_prompt_rewrite_texts
+from llmwrite.lang_conf import LangConf
+from llmwrite.questionary_ui import QuestionaryUI
 
 
 OpenAIMessages = List[Dict[str, str]]

@@ -1,5 +1,5 @@
 import pytest
-from gptwrite.prompts import build_prompt_generate_topics, build_prompt_generate_texts, build_prompt_rewrite_texts
+from llmwrite.prompts import build_prompt_generate_topics, build_prompt_generate_texts, build_prompt_rewrite_texts
 
 GENERATE_TOPICS_PROMPT_NO_NUANCE = """# Instruction
 A user wants to write an article based on the following theme.

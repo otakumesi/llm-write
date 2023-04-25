@@ -1,10 +1,10 @@
 import os
 import logging
 from pathlib import Path
-from gptwrite.lang_conf import LangConf
-from gptwrite.accepted_language import ACCEPTED_LANGUAGES
-from gptwrite.core import generate_topics, generate_texts
-from gptwrite.questionary_ui import QuestionaryUI
+from llmwrite.lang_conf import LangConf
+from llmwrite.accepted_language import ACCEPTED_LANGUAGES
+from llmwrite.core import generate_topics, generate_texts
+from llmwrite.questionary_ui import QuestionaryUI
 
 
 logger = logging.getLogger(__name__)
