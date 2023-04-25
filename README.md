@@ -17,7 +17,7 @@ PyPi:
 
 ## :runner: Installation
 ```sh
-pip install gptwrite
+pip install llmwrite
 ```
 
 ## :computer: Usage
