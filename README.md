@@ -5,7 +5,7 @@ __LLM make writing an article brazing fast :fire:.__
 PyPi:
 - https://pypi.org/project/llmwrite/
 
-![LLM-Write Demo](https://github.com/otakumesi/gpt-write/blob/main/demo.gif?raw=true "デモ")
+![LLM-Write Demo](https://github.com/otakumesi/llm-write/blob/main/demo.gif?raw=true "デモ")
 
 ## :telescope: Overview
 - This app is built with GPT-3.
@@ -27,7 +27,7 @@ pip install llmwrite
 export OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxx
 
 # Run
-gptwrite
+llmwrite
 ? Language? <Select Language>
 # ...(Lots of questions come in to the interactive.)
 ```
