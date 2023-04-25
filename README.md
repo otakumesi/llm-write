@@ -3,7 +3,7 @@
 __LLM make writing an article brazing fast :fire:.__
 
 PyPi:
-- https://pypi.org/project/gptwrite/
+- https://pypi.org/project/llmwrite/
 
 ![LLM-Write Demo](https://github.com/otakumesi/gpt-write/blob/main/demo.gif?raw=true "デモ")
 
