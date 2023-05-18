@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "llmwrite"
-version = "0.1.4"
+version = "0.1.6"
 description = "CLI for Automated article writing (Powered by GPT-3)"
 authors = ["otakumesi <bakednt@gmail.com>"]
 license = "MIT"
