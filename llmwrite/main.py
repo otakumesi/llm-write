@@ -9,8 +9,7 @@ from llmwrite.questionary_ui import QuestionaryUI
 
 logger = logging.getLogger(__name__)
 
-
-def write(qui = QuestionaryUI()) -> None:
+def run(qui = QuestionaryUI()) -> None:
     lang_conf = qui.ask_language()
 
     if not os.environ.get("OPENAI_API_KEY", None):
@@ -21,13 +20,10 @@ def write(qui = QuestionaryUI()) -> None:
     generated_topics = generate_topics(theme, lang_conf)
     selected_topics = qui.ask_want_select_topics(generated_topics)
 
-    while True:
-        if qui.confirm_want_add_topic():
-            topic_nuance = qui.ask_want_topic_nuance()
-            generated_topics = generate_topics(theme=theme, lang_conf=lang_conf, nuance=topic_nuance)
-            selected_topics += qui.ask_want_select_topics(generated_topics)
-        else:
-            break
+    while qui.confirm_want_add_topic():
+        topic_nuance = qui.ask_want_topic_nuance()
+        generated_topics = generate_topics(theme=theme, lang_conf=lang_conf, nuance=topic_nuance)
+        selected_topics += qui.ask_want_select_topics(generated_topics)
 
     paragraphs = []
     while selected_topics:
@@ -53,3 +49,10 @@ def write(qui = QuestionaryUI()) -> None:
             print(article)
     else:
         print(article)
+
+
+def write(qui = QuestionaryUI()) -> None:
+    try:
+        run(qui)
+    except KeyboardInterrupt:
+        print("^C")
