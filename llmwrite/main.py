@@ -16,20 +16,22 @@ def run(qui = QuestionaryUI()) -> None:
         logger.error(lang_conf.t("messages.no_api_key"))
         exit()
 
+    MODEL_NAME = os.environ.get("OPENAI_MODEL_NAME", "gpt-3.5-turbo-0301")
+
     theme = qui.ask_theme()
-    generated_topics = generate_topics(theme, lang_conf)
+    generated_topics = generate_topics(theme, lang_conf, model_name=MODEL_NAME)
     selected_topics = qui.ask_want_select_topics(generated_topics)
 
     while qui.confirm_want_add_topic():
         topic_nuance = qui.ask_want_topic_nuance()
-        generated_topics = generate_topics(theme=theme, lang_conf=lang_conf, nuance=topic_nuance)
+        generated_topics = generate_topics(theme=theme, lang_conf=lang_conf, nuance=topic_nuance, model_name=MODEL_NAME)
         selected_topics += qui.ask_want_select_topics(generated_topics)
 
     paragraphs = []
     while selected_topics:
         paragraph_topics = qui.ask_want_paragraph_topics(selected_topics)
         paragraph_nuance = qui.ask_want_paragraph_nuance()
-        text = generate_texts(theme=theme, topics=paragraph_topics, nuance=paragraph_nuance, qui=qui)
+        text = generate_texts(theme=theme, topics=paragraph_topics, nuance=paragraph_nuance, qui=qui, model_name=MODEL_NAME)
 
         if qui.confirm_want_accept_text(text):
             paragraphs.append(text)

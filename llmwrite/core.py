@@ -13,7 +13,7 @@ class ExecuteLLM(Protocol):
     def __call__(
             self,
             messages: OpenAIMessages,
-            model_name: str = "gpt-3.5-turbo",
+            model_name: str,
             stop: Optional[str] = None,
         ) -> str:
         raise NotImplementedError
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 def generate_text_by_llm(
         messages: OpenAIMessages,
         lang_conf: LangConf,
-        model_name: str = "gpt-3.5-turbo",
+        model_name: str,
         stop: Optional[str] = None
     ) -> str:
     with yaspin(text=lang_conf.t("messages.generating_text"), color="yellow") as spinner:
@@ -42,6 +42,7 @@ def generate_text_by_llm(
 def generate_topics(
         theme: str,
         lang_conf: LangConf,
+        model_name: str,
         nuance: Optional[str] = None,
         generate_text_func: ExecuteLLM = generate_text_by_llm,
     ) -> List[str]:
@@ -50,7 +51,7 @@ def generate_topics(
         "role": "user",
         "content": prompt,
     }]
-    content = generate_text_func(messages=messages, lang_conf=lang_conf)
+    content = generate_text_func(messages=messages, lang_conf=lang_conf, model_name=model_name)
     return put_generated_text_into_list(content)
 
 def put_generated_text_into_list(text: str) -> List[str]:
@@ -76,6 +77,7 @@ def generate_texts(
         topics: List[str],
         nuance: str,
         qui: QuestionaryUI,
+        model_name: str,
         generate_text_func: ExecuteLLM = generate_text_by_llm,
     ) -> str:
     prompt = build_prompt_generate_texts(theme=theme, topics=topics, nuance=nuance, language=qui.lang_conf.generation)
@@ -87,7 +89,7 @@ def generate_texts(
     writes = []
 
     while True:
-        content = generate_text_func(messages=messages, stop="\n\n", lang_conf=qui.lang_conf)
+        content = generate_text_func(messages=messages, stop="\n\n", lang_conf=qui.lang_conf, model_name=model_name)
         print(content)
 
         if content.startswith("[Consult]"):
@@ -117,11 +119,12 @@ def generate_texts(
 
         messages.append({"role": "system", "content": qui.lang_conf.t("messages.include_action")})
 
-    return rewrite_texts(writes, qui)
+    return rewrite_texts(writes, qui, model_name=model_name)
 
 def rewrite_texts(
         sentences: List[str],
         qui: QuestionaryUI,
+        model_name: str,
         generate_text_func: ExecuteLLM = generate_text_by_llm,
     ) -> str:
     print(qui.lang_conf.t("messages.rewrite"))
@@ -133,7 +136,7 @@ def rewrite_texts(
 
     result_texts = ""
     while True:
-        content = generate_text_func(messages=messages, lang_conf=qui.lang_conf)
+        content = generate_text_func(messages=messages, lang_conf=qui.lang_conf, model_name=model_name)
         print(content)
         result_texts += content
         if not qui.confirm_want_more():
